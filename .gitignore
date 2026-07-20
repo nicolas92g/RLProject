@@ -1,59 +1,30 @@
-# IDE
-.idea
-.vscode
-
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
+.eggs/
 
-# Virtual environments
-.venv
-pip-log.txt
-pip-delete-this-directory.txt
+# Environnements virtuels
+venv/
+.venv/
+env/
+ENV/
 
-# Environment variables
-.env
-.env.local
+# Jupyter
+# On VERSIONNE les notebooks (rapport = livrable imposé) : on n'ignore QUE les checkpoints.
+.ipynb_checkpoints/
 
-# Project-specific
-saved_models/*
-!saved_models/.gitkeep
-experiments/results/
-experiments/*.log
-*.pkl
-*.joblib
+# IDE / éditeurs
+.idea/
+.vscode/
 
 # OS / WSL / Windows
 .DS_Store
 Thumbs.db
 *:Zone.Identifier
 
-# Jupyter
-.ipynb_checkpoints
-*.ipynb
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
+# Expérimentation
+# Les modèles entraînés (saved_models/) sont VERSIONNÉS : livrable imposé, à rendre
+# prêts à réexécuter. On n'ignore que les logs. À ajuster si des artefacts lourds
+# (gros CSV, images) doivent être exclus par la suite.
+experiments/*.log
