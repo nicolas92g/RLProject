@@ -1,0 +1,6 @@
+numpy
+matplotlib
+jupyter
+ipykernel
+tqdm
+pygame
