@@ -44,9 +44,10 @@ experiments/*.log
 *.pkl
 *.joblib
 
-# OS
+# OS / WSL / Windows
 .DS_Store
 Thumbs.db
+*:Zone.Identifier
 
 # Jupyter
 .ipynb_checkpoints
