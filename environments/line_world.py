@@ -12,12 +12,7 @@ class LineWorld(MDPEnv):
         return rewards[i]
     def p(self, s: int, a: int, s_p: int, r_index: int) -> float:
         if s == 0:
-            if a == 0 and s_p == 0 and r_index == 0:
-                return 1.0
-            elif a == 1 and s_p == 1 and r_index == 1:
-                return 1.0
-            else:
-                return 0.0
+            return 0.0
         elif s == 1:
             if a == 0 and s_p == 0 and r_index == 0:
                 return 1.0
@@ -40,7 +35,5 @@ class LineWorld(MDPEnv):
             else:
                 return 0.0
         elif s == 4:
-            if a in [0,1] and s_p == 4 and r_index in [2]:
-                return 1.0
-            else:
-                return 0.0
+            return 0.0
+        else : return 0.0
