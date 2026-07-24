@@ -6,16 +6,15 @@ par seule interaction (model-free).
 
 ## État d'avancement
 
-Le projet est en cours de démarrage : **l'arborescence est en place, mais seul
-`environments/base.py` est implémenté** (les deux contrats d'environnement). Les
-modules d'algorithmes et d'environnements sont des fichiers vides à remplir.
-
 | Module | État |
 |---|---|
 | `environments/base.py` | ✅ contrats `MDPEnv` et `ModelFreeEnv` |
-| `environments/*` (line_world, grid_world, monty_hall_1/2, rock_paper_scissors) | ⬜ à implémenter |
-| `algorithms/*` (dynamic_programming, monte_carlo, temporal_difference, planning) | ⬜ à implémenter |
-| `utils/*` (policy, io) | ⬜ à implémenter |
+| `environments/line_world.py` | ✅ `MDPEnv` — ⬜ `ModelFreeEnv` |
+| `environments/*` (grid_world, monty_hall_1/2, rock_paper_scissors) | ⬜ à implémenter |
+| `algorithms/dynamic_programming.py` | ✅ Policy Iteration, Value Iteration (LineWorld) |
+| `algorithms/*` (monte_carlo, temporal_difference, planning) | ⬜ à implémenter |
+| `utils/policy.py` | ✅ représentation d'une politique |
+| `utils/io.py` | ⬜ à implémenter |
 
 ## Les deux contrats d'environnement
 
@@ -63,9 +62,12 @@ d'apprentissage.
 | Famille | Contrat requis | Algorithmes |
 |---|---|---|
 | Dynamic Programming | `MDPEnv` | Policy Iteration, Value Iteration |
-| Monte Carlo | `ModelFreeEnv` | First-visit, Every-visit, Exploring Starts, on/off-policy |
-| Temporal Difference | `ModelFreeEnv` | Sarsa, Q-Learning, Expected Sarsa |
-| Planning | `ModelFreeEnv` | Dyna-Q, Dyna-Q+ |
+| Monte Carlo | `ModelFreeEnv` | Monte Carlo ES, on-policy first-visit control, off-policy control |
+| Temporal Difference | `ModelFreeEnv` | Sarsa, Q-Learning |
+| Planning | `ModelFreeEnv` | Dyna-Q (Dyna-Q+ optionnel) |
+
+Liste exacte du sujet (`documents/SyllabusDuProjet.pdf`) — Expected Sarsa et
+Every-visit MC sont vus en cours mais **non demandés**, volontairement absents d'ici.
 
 ## Environnements visés
 
@@ -82,8 +84,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`requirements.txt` est encore vide : les dépendances y seront figées au fur et à
-mesure qu'elles sont réellement utilisées, plutôt que déclarées à l'avance.
+`requirements.txt` liste numpy, matplotlib, jupyter, ipykernel, tqdm, pygame
+(versions non épinglées pour l'instant).
 
 ## Organisation du dépôt
 
