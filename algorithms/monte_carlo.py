@@ -39,6 +39,17 @@ def action_epsilon_gloutonne(
     return action_gloutonne(Q, s, actions_disponibles)
 
 
+def _avertir_si_abandons(nb_abandonnes: int, nb_episodes: int, plafond: int) -> None:
+    # un épisode sans état terminal n'a pas de retour G défini : on ne peut que l'ignorer,
+    # mais jamais en silence — un plafond trop bas vide Q sans que rien ne le signale
+    if nb_abandonnes > 0:
+        part = 100.0 * nb_abandonnes / nb_episodes
+        print(
+            f"ATTENTION : {nb_abandonnes}/{nb_episodes} épisodes ({part:.0f}%) abandonnés, "
+            f"terminal jamais atteint en {plafond} pas — augmenter nb_pas_episode_max"
+        )
+
+
 def _premiere_visite(transitions: List[tuple]) -> List[bool]:
     # marque, pour chaque pas, s'il s'agit de la première occurrence de (s,a) dans l'épisode
     vus = set()
@@ -52,14 +63,15 @@ def _premiere_visite(transitions: List[tuple]) -> List[bool]:
 def monte_carlo_es(
     env: ModelFreeEnv,
     nb_episodes: int,
-    gamma: float = 1.0,
+    gamma: float = 0.999999,
     nb_pas_echauffement_max: int = 10,
-    nb_pas_episode_max: int = 200,
+    nb_pas_episode_max: int = 10_000,
 ) -> List[List[float]]:
     nb_etats = env.maximum_states_count()
     nb_actions = env.maximum_actions_count()
     Q = [[0.0] * nb_actions for _ in range(nb_etats)]
     compte = [[0] * nb_actions for _ in range(nb_etats)]
+    nb_abandonnes = 0
 
     for _ in range(nb_episodes):
         _demarrage_explorant(env, nb_pas_echauffement_max)
@@ -79,7 +91,8 @@ def monte_carlo_es(
             s_suivant = env.current_state()
             a = action_gloutonne(Q, s_suivant, env.available_actions())
         else:
-            continue  # cycle détecté (pas de terminal atteint) : épisode ignoré
+            nb_abandonnes += 1  # pas de terminal atteint : retour G indéfini, épisode ignoré
+            continue
 
         marques = _premiere_visite(transitions)
         G = 0.0
@@ -92,20 +105,22 @@ def monte_carlo_es(
 
         Q[env.current_state()] = [0.0] * nb_actions  # état terminal : Q = 0
 
+    _avertir_si_abandons(nb_abandonnes, nb_episodes, nb_pas_episode_max)
     return Q
 
 
 def mc_on_policy_first_visit(
     env: ModelFreeEnv,
     nb_episodes: int,
-    gamma: float = 1.0,
+    gamma: float = 0.999999,
     epsilon: float = 0.1,
-    nb_pas_episode_max: int = 200,
+    nb_pas_episode_max: int = 10_000,
 ) -> List[List[float]]:
     nb_etats = env.maximum_states_count()
     nb_actions = env.maximum_actions_count()
     Q = [[0.0] * nb_actions for _ in range(nb_etats)]
     compte = [[0] * nb_actions for _ in range(nb_etats)]
+    nb_abandonnes = 0
 
     for _ in range(nb_episodes):
         env.reset()
@@ -121,7 +136,8 @@ def mc_on_policy_first_visit(
             r = env.score() - score_avant
             transitions.append((s, a, r))
         else:
-            continue  # filet de sécurité, cf. monte_carlo_es (peu probable en epsilon-soft)
+            nb_abandonnes += 1  # cf. monte_carlo_es
+            continue
 
         marques = _premiere_visite(transitions)
         G = 0.0
@@ -134,4 +150,5 @@ def mc_on_policy_first_visit(
 
         Q[env.current_state()] = [0.0] * nb_actions  # état terminal : Q = 0
 
+    _avertir_si_abandons(nb_abandonnes, nb_episodes, nb_pas_episode_max)
     return Q

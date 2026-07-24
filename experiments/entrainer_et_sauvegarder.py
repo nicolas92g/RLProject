@@ -3,6 +3,7 @@
 import os
 
 from algorithms.dynamic_programming import policy_iteration
+from algorithms.monte_carlo import monte_carlo_es
 from algorithms.temporal_difference import q_learning
 from environments.line_world import LineWorld, LineWorldEnv
 from environments.monty_hall_1 import MontyHall1, MontyHall1Env
@@ -21,6 +22,9 @@ def entrainer_line_world() -> None:
     Q = q_learning(LineWorldEnv(), nb_episodes=5000)
     sauvegarder_Q(Q, f"{dossier}/Q_q_learning.json")
 
+    Q_mc = monte_carlo_es(LineWorldEnv(), nb_episodes=5000)
+    sauvegarder_Q(Q_mc, f"{dossier}/Q_mc_es.json")
+
 
 def entrainer_monty_hall_1() -> None:
     dossier = "saved_models/monty_hall_1"
@@ -32,6 +36,9 @@ def entrainer_monty_hall_1() -> None:
 
     Q = q_learning(MontyHall1Env(), nb_episodes=20000, gamma=1.0)
     sauvegarder_Q(Q, f"{dossier}/Q_q_learning.json")
+
+    Q_mc = monte_carlo_es(MontyHall1Env(), nb_episodes=20000, gamma=1.0, nb_pas_echauffement_max=3)
+    sauvegarder_Q(Q_mc, f"{dossier}/Q_mc_es.json")
 
 
 def entrainer_secret_env_0() -> None:
