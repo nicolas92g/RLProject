@@ -1,6 +1,7 @@
 # Entraîne et sauvegarde les modèles des 4 envs de Robin, pour le rejeu sans réentraîner
 # (livrable imposé : policies/V/Q entraînées et prêtes à réexécuter, cf. SPECS.md §1).
 import os
+import random
 
 from algorithms.dynamic_programming import policy_iteration
 from algorithms.monte_carlo import monte_carlo_es
@@ -9,6 +10,11 @@ from environments.line_world import LineWorld, LineWorldEnv
 from environments.monty_hall_1 import MontyHall1, MontyHall1Env
 from environments.secret_envs import secret_env_0, secret_env_1
 from utils.io import sauvegarder_politique, sauvegarder_Q, sauvegarder_V
+
+# Tout l'aléatoire du projet passe par le module random de Python (vérifié : y compris
+# les secret envs, dont le binaire est déterministe). Une seule graine ici suffit donc
+# à rendre les modèles sauvegardés reproductibles à l'identique.
+GRAINE = 42
 
 
 def entrainer_line_world() -> None:
@@ -56,6 +62,7 @@ def entrainer_secret_env_1() -> None:
 
 
 if __name__ == "__main__":
+    random.seed(GRAINE)
     print("LineWorld...")
     entrainer_line_world()
     print("Monty Hall 1...")
