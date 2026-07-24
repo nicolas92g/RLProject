@@ -1,4 +1,6 @@
-from environments.base import MDPEnv
+from typing import List
+
+from environments.base import MDPEnv, ModelFreeEnv
 
 class LineWorld(MDPEnv):
     def num_states (self) -> int:
@@ -37,3 +39,51 @@ class LineWorld(MDPEnv):
         elif s == 4:
             return 0.0
         else : return 0.0
+
+
+class LineWorldEnv(ModelFreeEnv):
+    # conventions du notebook du prof : 5 cases, départ au milieu, terminal aux bouts
+    NUM_CELLS = 5
+
+    def __init__(self) -> None:
+        self.reset()
+
+    def reset(self) -> None:
+        self.agent_pos = self.NUM_CELLS // 2
+
+    def is_game_over(self) -> bool:
+        return self.agent_pos == 0 or self.agent_pos == self.NUM_CELLS - 1
+
+    def step(self, action: int) -> None:
+        if self.is_game_over():
+            raise ValueError("la partie est déjà terminée")
+        if action not in self.available_actions():
+            raise ValueError(f"action invalide : {action}")
+        if action == 0:
+            self.agent_pos -= 1
+        else:
+            self.agent_pos += 1
+
+    def current_state(self) -> int:
+        return self.agent_pos
+
+    def available_actions(self) -> List[int]:
+        return [0, 1]
+
+    def score(self) -> float:
+        if self.agent_pos == 0:
+            return -1.0
+        if self.agent_pos == self.NUM_CELLS - 1:
+            return 1.0
+        return 0.0
+
+    def pretty_print(self) -> None:
+        cases = ["_"] * self.NUM_CELLS
+        cases[self.agent_pos] = "X"
+        print("".join(cases))
+
+    def maximum_states_count(self) -> int:
+        return self.NUM_CELLS
+
+    def maximum_actions_count(self) -> int:
+        return 2
