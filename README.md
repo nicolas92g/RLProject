@@ -9,12 +9,19 @@ par seule interaction (model-free).
 | Module | État |
 |---|---|
 | `environments/base.py` | ✅ contrats `MDPEnv` et `ModelFreeEnv` |
-| `environments/line_world.py` | ✅ `MDPEnv` — ⬜ `ModelFreeEnv` |
-| `environments/*` (grid_world, monty_hall_1/2, rock_paper_scissors) | ⬜ à implémenter |
-| `algorithms/dynamic_programming.py` | ✅ Policy Iteration, Value Iteration (LineWorld) |
-| `algorithms/*` (monte_carlo, temporal_difference, planning) | ⬜ à implémenter |
+| `environments/line_world.py` | ✅ `MDPEnv` + `ModelFreeEnv` |
+| `environments/monty_hall_1.py` | ✅ `MDPEnv` + `ModelFreeEnv` |
+| `environments/secret_envs.py` | ✅ adaptateur pour les 4 secret envs fournis (`SecretEnv0`–`3`) |
+| `environments/grid_world.py`, `monty_hall_2.py`, `rock_paper_scissors.py` | ⬜ à implémenter |
+| `algorithms/dynamic_programming.py` | ✅ Policy Iteration, Value Iteration |
+| `algorithms/monte_carlo.py` | ✅ Monte Carlo ES, on-policy first-visit — ⬜ off-policy |
+| `algorithms/temporal_difference.py` | ✅ Sarsa, Q-Learning |
+| `algorithms/planning.py` | ✅ Dyna-Q — ⬜ Dyna-Q+ (optionnel) |
 | `utils/policy.py` | ✅ représentation d'une politique |
-| `utils/io.py` | ⬜ à implémenter |
+| `utils/io.py` | ✅ sauvegarde/chargement JSON (`V`, `Q`, `Politique`) |
+| `utils/episode.py` | ✅ `run_episode()` — socle model-free commun (Δscore) |
+| `utils/interaction.py` | ✅ rejeu pas-à-pas d'une politique sauvegardée + mode manuel |
+| `experiments/entrainer_et_sauvegarder.py` | ✅ génère les modèles de `saved_models/` |
 
 ## Les deux contrats d'environnement
 
@@ -50,7 +57,7 @@ score() -> float
 
 maximum_states_count() -> int       # pré-allocation des tableaux V/Q uniquement
 maximum_actions_count() -> int
-pretty_print() -> None              # optionnel, pour le débogage
+pretty_print() -> None              # visualisation exigée par le sujet à chaque action
 ```
 
 `maximum_states_count()` et `maximum_actions_count()` servent exclusivement à
@@ -75,6 +82,8 @@ Every-visit MC sont vus en cours mais **non demandés**, volontairement absents 
 - **Grid World** — extension 2D
 - **Monty Hall (1 et 2)** — épisodes très courts, sensibles au facteur d'actualisation
 - **Rock Paper Scissors** — adversaire stochastique
+- **Secret Env 0 à 3** — environnements « boîte noire » fournis par le prof
+  (binaire + wrapper), accessibles via `environments/secret_envs.py`
 
 ## Installation
 
@@ -87,16 +96,32 @@ pip install -r requirements.txt
 `requirements.txt` liste numpy, matplotlib, jupyter, ipykernel, tqdm, pygame
 (versions non épinglées pour l'instant).
 
+## Entraîner et rejouer un modèle
+
+```bash
+python -m experiments.entrainer_et_sauvegarder   # écrit dans saved_models/
+```
+
+```python
+from environments.line_world import LineWorldEnv
+from utils.io import charger_Q
+from utils.interaction import rejouer_politique, jouer_manuellement
+
+Q = charger_Q("saved_models/line_world/Q_q_learning.json")
+rejouer_politique(LineWorldEnv(), Q)   # rejeu pas-à-pas, sans réentraîner
+jouer_manuellement(LineWorldEnv())     # mode manuel (agent humain)
+```
+
 ## Organisation du dépôt
 
 ```
 algorithms/     implémentations RL
 environments/   problèmes test + contrats (base.py)
-utils/          représentation des politiques, entrées/sorties
-experiments/    scripts d'expérimentation (résultats non versionnés)
-saved_models/   checkpoints (non versionnés)
+utils/          représentation des politiques, entrées/sorties, rejeu/mode manuel
+experiments/    scripts d'expérimentation et d'entraînement
+saved_models/   modèles entraînés (versionnés — livrable imposé par le sujet)
 report/         rapport et visualisations
-libs/           dépendances externes éventuelles
+libs/           binaires des secret envs fournis par le prof (.so/.dll/.dylib)
 ```
 
 ## Conventions
