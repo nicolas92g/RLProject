@@ -28,3 +28,4 @@ Thumbs.db
 # prêts à réexécuter. On n'ignore que les logs. À ajuster si des artefacts lourds
 # (gros CSV, images) doivent être exclus par la suite.
 experiments/*.log
+documents/
