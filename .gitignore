@@ -30,3 +30,4 @@ Thumbs.db
 experiments/*.log
 documents/
 .claude/
+*.so
