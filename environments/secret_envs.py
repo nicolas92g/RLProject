@@ -1,55 +1,35 @@
-"""
-Adaptateurs pour Secret Env 2 et Secret Env 3 (cf. documents/cours/secret_envs_wrapper.py).
-Le wrapper du prof n'est jamais utilisé directement par les algos : on l'enveloppe
-ici pour exposer nos contrats MDPEnv/ModelFreeEnv (environments/base.py).
+# Adaptateur ModelFreeEnv pour les secret envs 0 à 3 (wrapper fourni par le prof).
+import os
+import platform
+from typing import List
 
-Renommages : state_id() -> current_state(), display() -> pretty_print().
-Env 2 et 3 partagent une API C identique (juste le numéro dans le nom des
-fonctions change) : une classe de base paramétrée par _wrapper_cls évite de
-recopier l'adaptateur pour zéro différence conceptuelle entre les deux.
-"""
+from environments import secret_envs_wrapper as wrapper
+from environments.base import ModelFreeEnv
 
-from typing import List, Optional
+# le wrapper fourni résout lib_path en relatif ("./libs/...") selon le cwd du process ;
+# on le remplace par un chemin absolu pour ne pas dépendre du répertoire d'exécution
+_LIBS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "libs")
+_SYSTEM = platform.system().lower()
+if _SYSTEM == "windows":
+    wrapper.lib_path = os.path.join(_LIBS_DIR, "secret_envs.dll")
+elif _SYSTEM == "linux":
+    wrapper.lib_path = os.path.join(_LIBS_DIR, "libsecret_envs.so")
+elif _SYSTEM == "darwin":
+    if "intel" in platform.processor().lower():
+        wrapper.lib_path = os.path.join(_LIBS_DIR, "libsecret_envs_intel_macos.dylib")
+    else:
+        wrapper.lib_path = os.path.join(_LIBS_DIR, "libsecret_envs.dylib")
 
-from documents.cours import secret_envs_wrapper as _wrapper
-from environments.base import MDPEnv, ModelFreeEnv
 
-
-class _SecretEnvAdapter(MDPEnv, ModelFreeEnv):
-    _wrapper_cls = None  # défini par chaque sous-classe (SecretEnvNWrapper.SecretEnvN)
-
-    def __init__(self, _env: Optional[object] = None) -> None:
-        self._env = _env if _env is not None else self._wrapper_cls()
-
-    @classmethod
-    def from_random_state(cls) -> "_SecretEnvAdapter":
-        return cls(_env=cls._wrapper_cls.from_random_state())
-
-    # Contrat MDPEnv
-
-    def num_states(self) -> int:
-        return self._env.num_states()
-
-    def num_actions(self) -> int:
-        return self._env.num_actions()
-
-    def num_rewards(self) -> int:
-        return self._env.num_rewards()
-
-    def reward(self, i: int) -> float:
-        return self._env.reward(i)
-
-    def p(self, s: int, a: int, s_p: int, r_index: int) -> float:
-        return self._env.p(s, a, s_p, r_index)
-
-    # Contrat ModelFreeEnv
+class SecretEnvAdapter(ModelFreeEnv):
+    # traduit l'interface du wrapper (state_id/display/np.uint64) vers notre contrat
+    def __init__(self, secret_env_cls) -> None:
+        self._env = secret_env_cls()
 
     def reset(self) -> None:
         self._env.reset()
 
     def step(self, action: int) -> None:
-        if self.is_game_over():
-            raise ValueError("Épisode terminé : appeler reset() avant step().")
         self._env.step(action)
 
     def is_game_over(self) -> bool:
@@ -59,28 +39,33 @@ class _SecretEnvAdapter(MDPEnv, ModelFreeEnv):
         return self._env.state_id()
 
     def available_actions(self) -> List[int]:
+        # np.uint64 -> int, sinon ctypes.step() plante
         return [int(a) for a in self._env.available_actions()]
 
     def score(self) -> float:
         return self._env.score()
 
-    def maximum_states_count(self) -> int:
-        return self.num_states()
-
-    def maximum_actions_count(self) -> int:
-        return self.num_actions()
-
     def pretty_print(self) -> None:
         self._env.display()
 
-    # Extra fourni par le wrapper, utile hors contrat (debug / mode humain)
-    def is_forbidden(self, action: int) -> bool:
-        return bool(self._env.is_forbidden(action))
+    def maximum_states_count(self) -> int:
+        return self._env.num_states()
+
+    def maximum_actions_count(self) -> int:
+        return self._env.num_actions()
 
 
-class SecretEnv2(_SecretEnvAdapter):
-    _wrapper_cls = _wrapper.SecretEnv2
+def secret_env_0() -> SecretEnvAdapter:
+    return SecretEnvAdapter(wrapper.SecretEnv0)
 
 
-class SecretEnv3(_SecretEnvAdapter):
-    _wrapper_cls = _wrapper.SecretEnv3
+def secret_env_1() -> SecretEnvAdapter:
+    return SecretEnvAdapter(wrapper.SecretEnv1)
+
+
+def secret_env_2() -> SecretEnvAdapter:
+    return SecretEnvAdapter(wrapper.SecretEnv2)
+
+
+def secret_env_3() -> SecretEnvAdapter:
+    return SecretEnvAdapter(wrapper.SecretEnv3)
