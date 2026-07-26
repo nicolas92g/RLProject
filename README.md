@@ -79,7 +79,7 @@ d'apprentissage.
 | Planning | `ModelFreeEnv` | Dyna-Q (Dyna-Q+ optionnel) |
 
 Liste exacte du sujet (`documents/SyllabusDuProjet.pdf`) — Expected Sarsa et
-Every-visit MC sont vus en cours mais **non demandés**, volontairement absents d'ici.
+Double Q-Learning sont vus en cours mais **non demandés**, volontairement absents d'ici.
 
 ## Environnements visés
 
@@ -128,10 +128,3 @@ saved_models/   modèles entraînés (versionnés — livrable imposé par le su
 report/         rapport et visualisations
 libs/           binaires des secret envs fournis par le prof (.so/.dll/.dylib)
 ```
-
-## Conventions
-
-- Identifiants (fonctions, variables, classes) en **anglais** ; docstrings et
-  commentaires en **français** — voir `CLAUDE.md` pour le détail
-- Un algorithme ne dépend que du contrat d'environnement, pas d'une implémentation
-- Messages de commit : `type: description` (`feat:`, `fix:`, `docs:`, `refactor:`)
