@@ -1,6 +1,6 @@
 # Compare Policy Iteration et Value Iteration sur Grid World, Monty Hall 2 et
-# Rock Paper Scissors (TODO.md Phase 3, étape 1) : les deux algos DP doivent
-# converger vers le même V*/politique — sinon bug dans l'un des deux.
+# Rock Paper Scissors : les deux algos DP doivent converger vers le meme
+# V*/politique, sinon il y a un bug dans l'un des deux.
 import time
 
 from algorithms.dynamic_programming import policy_iteration, value_iteration

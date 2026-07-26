@@ -1,14 +1,14 @@
-# Monty Hall (3 portes, 2 décisions) : choisir une porte, puis garder/changer.
+# Monty Hall (3 portes, 2 decisions) : choisir une porte, puis garder/changer.
 import random
 from typing import List
 
 from environments.base import MDPEnv, ModelFreeEnv
 
-# États : 0 = départ, 1/2/3 = porte c=0/1/2 choisie (en attente garder/changer), 4 = terminal
-# Actions : 0/1/2 au départ (choisir une porte), puis 0=garder / 1=changer (2 inutilisé)
-# Le numéro de la porte révélée par le présentateur n'a pas besoin d'être dans l'état :
-# à chosen_door fixé, P(gagner) ne dépend pas de laquelle des deux autres portes a été
-# révélée (symétrie), donc (0/1/2/3/4) reste bien markovien pour la décision garder/changer.
+# etats : 0 = depart, 1/2/3 = porte choisie (en attente garder/changer), 4 = terminal
+# actions : 0/1/2 au depart (choisir une porte), puis 0=garder / 1=changer (2 inutilise)
+# le numero de la porte revelee par le presentateur n'a pas besoin d'etre dans l'etat :
+# a chosen_door fixe, la proba de gagner ne depend pas de laquelle des deux autres
+# portes a ete revelee (symetrie), donc l'etat reste bien markovien pour garder/changer
 
 
 class MontyHall1(MDPEnv):
@@ -26,18 +26,18 @@ class MontyHall1(MDPEnv):
 
     def p(self, s: int, a: int, s_p: int, r_index: int) -> float:
         if s == 0:
-            # choisir une porte : pas de récompense, transition déterministe vers l'état 1+a
+            # choisir une porte : pas de recompense, transition deterministe vers l'etat 1+a
             if a in (0, 1, 2) and s_p == 1 + a and r_index == 0:
                 return 1.0
             return 0.0
         elif s in (1, 2, 3):
             if s_p != 4:
                 return 0.0
-            if a == 0:  # garder : gagne si la porte choisie était la bonne (proba 1/3)
+            if a == 0:  # garder : gagne si la porte choisie etait la bonne (proba 1/3)
                 if r_index == 1:
                     return 1.0 / 3.0
                 return 2.0 / 3.0
-            elif a == 1:  # changer : gagne dans les 2/3 des cas (résultat classique)
+            elif a == 1:  # changer : gagne dans les 2/3 des cas (resultat classique)
                 if r_index == 1:
                     return 2.0 / 3.0
                 return 1.0 / 3.0
@@ -66,11 +66,11 @@ class MontyHall1Env(ModelFreeEnv):
             raise ValueError(f"action invalide : {action}")
         if self.chosen_door is None:
             self.chosen_door = action
-            # le présentateur révèle une porte non choisie et non gagnante
+            # le presentateur revele une porte non choisie et non gagnante
             candidates = [d for d in range(3) if d != self.chosen_door and d != self.winning_door]
             self.revealed_door = random.choice(candidates)
         else:
-            if action == 1:  # changer : la seule porte ni choisie ni révélée
+            if action == 1:  # changer : la seule porte ni choisie ni revelee
                 self.chosen_door = 3 - self.chosen_door - self.revealed_door
             self.finished = True
 

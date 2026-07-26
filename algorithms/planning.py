@@ -1,19 +1,18 @@
-# Dyna-Q, cf. Sutton & Barto §8.2.
+# Dyna-Q
 import random
 from typing import Dict, List, Tuple
 
 from algorithms.monte_carlo import action_epsilon_gloutonne
 from environments.base import ModelFreeEnv
 
-# Le max_a Q(s',a) ne peut pas interroger available_actions() pour un état simulé
-# (l'env réel n'y est pas physiquement) : on le restreint aux actions déjà observées
-# dans cet état. Indispensable dès que les récompenses peuvent être négatives (secret
-# envs) : une action inexistante garde Q = 0.0, qui l'emporterait sur un vrai Q négatif
-# et surestimerait la valeur de l'état. Voir FINDINGS.md.
+# max_a Q(s',a) ne peut pas appeler available_actions() sur un etat simule (l'env
+# reel n'y est pas). On restreint donc aux actions deja vues dans cet etat, sinon
+# une action jamais essayee garde Q=0.0 qui l'emporterait sur un vrai Q negatif
+# (secret envs) et surestimerait la valeur de l'etat. Voir FINDINGS.md.
 
 
 def _max_q(Q, s: int, actions_vues: dict) -> float:
-    # max restreint aux actions déjà prises dans s ; 0.0 si l'état n'a jamais été visité
+    # max restreint aux actions deja prises dans s, 0.0 si l'etat n'a jamais ete visite
     connues = actions_vues.get(s)
     if not connues:
         return 0.0
@@ -32,7 +31,7 @@ def dyna_q(
     nb_actions = env.maximum_actions_count()
     Q = [[0.0] * nb_actions for _ in range(nb_etats)]
     modele: Dict[Tuple[int, int], Tuple[float, int]] = {}
-    actions_vues: Dict[int, list] = {}  # état déjà observé -> actions déjà prises dedans
+    actions_vues: Dict[int, list] = {}  # etat deja observe -> actions deja prises dedans
 
     for _ in range(nb_episodes):
         env.reset()
@@ -52,10 +51,10 @@ def dyna_q(
                 Q[s][a] += alpha * (r - Q[s][a])
                 Q[s_p] = [0.0] * nb_actions
             else:
-                # bootstrap sur le max restreint aux actions connues de s', cf. _max_q
+                # bootstrap sur le max restreint aux actions connues de s' (cf _max_q)
                 Q[s][a] += alpha * (r + gamma * _max_q(Q, s_p, actions_vues) - Q[s][a])
 
-            # planification : n mises à jour supplémentaires simulées depuis le modèle appris
+            # planification : n maj supplementaires simulees depuis le modele appris
             etats_connus = list(actions_vues.keys())
             for _ in range(n_planification):
                 s_sim = random.choice(etats_connus)

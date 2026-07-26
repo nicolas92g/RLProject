@@ -1,4 +1,4 @@
-# BASE definit les contrats avec 2 classes MDPenv et ModelFreeEnv, pour les environnements avec et sans modèle.
+# BASE definit les contrats avec 2 classes MDPenv et ModelFreeEnv, pour les environnements avec et sans modele.
 
 from typing import List
 
@@ -31,7 +31,7 @@ class ModelFreeEnv :
     def pretty_print(self) -> None:
         raise NotImplementedError
 
-    # pour des raisons de performance uniquement (pré-allocation de tableaux V/Q)
+    # pour des raisons de performance uniquement (pre-allocation de tableaux V/Q)
     def maximum_states_count(self) -> int:
         raise NotImplementedError
     def maximum_actions_count(self) -> int:

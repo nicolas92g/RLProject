@@ -1,9 +1,8 @@
-# Compare les 6 algorithmes model-free sur les 4 secret envs, à partir des
-# modèles déjà sauvegardés par entrainer_et_sauvegarder.py (pas de
-# ré-entraînement ici). Pas de contrat MDPEnv pour ces boîtes noires, donc
-# pas de V* exact contre lequel vérifier comme dans les scripts
-# comparer_*.py précédents : la seule mesure de qualité disponible est le
-# score moyen obtenu en rejouant la politique gloutonne apprise.
+# Compare les 6 algorithmes model-free sur les 4 secret envs, a partir des
+# modeles deja sauvegardes par entrainer_et_sauvegarder.py (pas de
+# reentrainement ici). Pas de contrat MDPEnv pour ces boites noires, donc
+# pas de V* exact contre lequel verifier : la seule mesure de qualite
+# disponible est le score moyen obtenu en rejouant la politique gloutonne.
 from environments.secret_envs import secret_env_0, secret_env_1, secret_env_2, secret_env_3
 from utils.io import charger_Q
 

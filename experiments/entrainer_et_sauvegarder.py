@@ -1,5 +1,4 @@
-# Entraîne et sauvegarde les modèles des 4 envs de Robin, pour le rejeu sans réentraîner
-# (livrable imposé : policies/V/Q entraînées et prêtes à réexécuter, cf. SPECS.md §1).
+# Entraine et sauvegarde les modeles de chaque env, pour le rejeu sans reentrainer.
 import os
 import random
 
@@ -15,9 +14,8 @@ from environments.rock_paper_scissors import TwoRoundRPS
 from environments.secret_envs import secret_env_0, secret_env_1, secret_env_2, secret_env_3
 from utils.io import sauvegarder_politique, sauvegarder_Q, sauvegarder_V
 
-# Tout l'aléatoire du projet passe par le module random de Python (vérifié : y compris
-# les secret envs, dont le binaire est déterministe). Une seule graine ici suffit donc
-# à rendre les modèles sauvegardés reproductibles à l'identique.
+# tout l'aleatoire du projet passe par le module random de Python, une seule
+# graine ici suffit donc a rendre les modeles reproductibles a l'identique
 GRAINE = 42
 
 
@@ -70,22 +68,16 @@ def entrainer_monty_hall_2() -> None:
     dossier = "saved_models/monty_hall_2"
     os.makedirs(dossier, exist_ok=True)
 
-    # gamma=1.0 comme Monty Hall 1 : problème épisodique où seul le résultat
-    # final compte, l'actualisation n'a pas de sens théorique ici.
-    # rng seedée explicitement : MontyHall2 tire son aléatoire dans une
-    # instance random.Random() propre, non affectée par random.seed(GRAINE).
+    # gamma=1.0 comme Monty Hall 1, seul le resultat final compte
+    # rng seedee explicitement, MontyHall2 a son propre random.Random()
     pi, V = policy_iteration(MontyHall2(), gamma=1.0)
     sauvegarder_V(V, f"{dossier}/V_policy_iteration.json")
     sauvegarder_politique(pi, f"{dossier}/politique_policy_iteration.json")
 
-    # Piège découvert en validant : les états 4 à 7 (décision finale) ne sont
-    # atteints qu'après DEUX choix non-gloutons d'affilée à la suite (decision
-    # 2 puis decision 3), donc sous-échantillonnés par l'exploration
-    # epsilon-greedy à budget d'épisodes raisonnable — Q-Learning converge
-    # vers l'optimum exact seulement ~50% des runs (mesuré sur 10 graines).
-    # On vérifie contre Policy Iteration (calcul exact) et on retente avec
-    # une graine différente plutôt que de sauvegarder une politique non
-    # convergée en silence.
+    # les etats 4 a 7 ne sont atteints qu'apres 2 choix non-gloutons
+    # d'affilee, donc sous-explores par epsilon-greedy : Q-Learning ne
+    # retrouve l'optimum exact qu'1 fois sur 2 environ. on verifie contre
+    # Policy Iteration et on retente avec une autre graine si besoin
     optimal = {s: pi.meilleure_action(s) for s in range(1, 8)}
     for tentative in range(20):
         graine = GRAINE + tentative
@@ -95,7 +87,7 @@ def entrainer_monty_hall_2() -> None:
         if appris == optimal:
             break
     else:
-        print("ATTENTION : Q-Learning n'a pas retrouvé l'optimum exact sur Monty Hall 2 après 20 graines.")
+        print("ATTENTION : Q-Learning n'a pas retrouve l'optimum exact sur Monty Hall 2 apres 20 graines.")
     sauvegarder_Q(Q, f"{dossier}/Q_q_learning.json")
 
     Q_mc = monte_carlo_es(
@@ -108,8 +100,8 @@ def entrainer_rock_paper_scissors() -> None:
     dossier = "saved_models/rock_paper_scissors"
     os.makedirs(dossier, exist_ok=True)
 
-    # gamma=1.0 : score() est la somme non actualisée des deux rounds.
-    # rng seedée explicitement, même raison que MontyHall2 (cf. ci-dessus).
+    # gamma=1.0 : score() est la somme non actualisee des deux rounds
+    # rng seedee explicitement, meme raison que MontyHall2
     pi, V = policy_iteration(TwoRoundRPS(), gamma=1.0)
     sauvegarder_V(V, f"{dossier}/V_policy_iteration.json")
     sauvegarder_politique(pi, f"{dossier}/politique_policy_iteration.json")
@@ -123,11 +115,9 @@ def entrainer_rock_paper_scissors() -> None:
     sauvegarder_Q(Q_mc, f"{dossier}/Q_mc_es.json")
 
 
-# Secret envs : pas de contrat MDPEnv (boîte noire), donc pas de Policy/Value
-# Iteration possible — seuls les 6 algos model-free s'appliquent. Les 4 secret
-# envs reçoivent exactement le même traitement (aucun réglage spécifique à
-# ajuster sans modèle connu), d'où le partage de cette fonction plutôt que 4
-# copies identiques.
+# secret envs : pas de contrat MDPEnv (boite noire), seuls les 6 algos
+# model-free s'appliquent. les 4 recoivent le meme traitement, d'ou le
+# partage de cette fonction plutot que 4 copies identiques
 def _entrainer_secret_env(fabrique, dossier) -> None:
     os.makedirs(dossier, exist_ok=True)
 

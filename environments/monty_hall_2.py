@@ -1,7 +1,7 @@
 """
-Monty Hall niveau 2 : 5 portes, 4 décisions, reward uniquement à la fin.
-État encode l'historique des décisions 2 et 3 pour être markovien.
-Contrats MDPEnv (proba exacte par énumération) et ModelFreeEnv.
+Monty Hall niveau 2 : 5 portes, 4 decisions, reward uniquement a la fin.
+Etat encode l'historique des decisions 2 et 3 pour etre markovien.
+Contrats MDPEnv (proba exacte par enumeration) et ModelFreeEnv.
 """
 
 import random
@@ -12,8 +12,8 @@ from environments.base import MDPEnv, ModelFreeEnv
 
 NB_PORTES = 5
 
-# Actions des décisions 2, 3 et 4. À la décision 1, l'action est
-# directement l'indice de la porte choisie (0 à 4).
+# actions des decisions 2, 3 et 4. A la decision 1, l'action est
+# directement l'indice de la porte choisie (0 a 4)
 GARDER = 0
 CHANGER = 1
 
@@ -21,17 +21,17 @@ NOMS_DECISIONS = {GARDER: "garder", CHANGER: "changer"}
 
 
 def _proba_tenue_gagnante(decision_2: int, decision_3: int) -> Fraction:
-    """Proba exacte tenue gagnante à la décision 4. Énumération exhaustive."""
-    # Départ : l'agent tient la porte 0, la gagnante est uniforme.
+    # proba exacte tenue gagnante a la decision 4, enumeration exhaustive
+    # depart : l'agent tient la porte 0, la gagnante est uniforme
     configs = {
         (frozenset(range(NB_PORTES)), 0, gagnante): Fraction(1, NB_PORTES)
         for gagnante in range(NB_PORTES)
     }
 
-    # Le jeu alterne : [décision] puis retrait, trois fois. `None` marque le
-    # premier tour (la décision 1 est déjà appliquée : tenue = porte 0).
+    # le jeu alterne : decision puis retrait, trois fois. None marque le
+    # premier tour (la decision 1 est deja appliquee : tenue = porte 0)
     for decision in (None, decision_2, decision_3):
-        # a) la décision de l'agent (changer = une autre porte, équiprobable)
+        # a) la decision de l'agent (changer = une autre porte, equiprobable)
         if decision == CHANGER:
             apres = {}
             for (portes, tenue, gagnante), proba in configs.items():
@@ -41,8 +41,8 @@ def _proba_tenue_gagnante(decision_2: int, decision_3: int) -> Fraction:
                     apres[cle] = apres.get(cle, Fraction(0)) + proba / len(autres)
             configs = apres
 
-        # b) le présentateur retire une porte non tenue et non gagnante,
-        #    équiprobable parmi les candidates
+        # b) le presentateur retire une porte non tenue et non gagnante,
+        #    equiprobable parmi les candidates
         apres = {}
         for (portes, tenue, gagnante), proba in configs.items():
             candidates = [pt for pt in portes if pt != tenue and pt != gagnante]
@@ -59,7 +59,7 @@ def _proba_tenue_gagnante(decision_2: int, decision_3: int) -> Fraction:
 
 
 class MontyHall2(MDPEnv, ModelFreeEnv):
-    """Monty Hall à 5 portes et 4 décisions (état = historique des choix)."""
+    # Monty Hall a 5 portes et 4 decisions (etat = historique des choix)
 
     DEPART = 0
     TERMINAL = 8
@@ -67,8 +67,8 @@ class MontyHall2(MDPEnv, ModelFreeEnv):
     def __init__(self, rng: Optional[random.Random] = None) -> None:
         self._rng = rng if rng is not None else random.Random()
         self._recompenses = [0.0, 1.0]
-        # P(porte tenue gagnante à la décision 4 | décisions 2 et 3) —
-        # exact, calculé une fois pour toutes pour le modèle MDPEnv.
+        # proba de tenir la porte gagnante a la decision 4 sachant les
+        # decisions 2 et 3, calculee une fois pour toutes pour le MDPEnv
         self._proba_gagne_si_garde = {
             (d2, d3): _proba_tenue_gagnante(d2, d3)
             for d2 in (GARDER, CHANGER)
@@ -76,13 +76,13 @@ class MontyHall2(MDPEnv, ModelFreeEnv):
         }
         self.reset()
 
-    # Contrat MDPEnv
+    # contrat MDPEnv
 
     def num_states(self) -> int:
         return 9
 
     def num_actions(self) -> int:
-        return NB_PORTES  # 5, pour couvrir le choix de porte de la décision 1
+        return NB_PORTES  # 5, pour couvrir le choix de porte de la decision 1
 
     def num_rewards(self) -> int:
         return len(self._recompenses)
@@ -91,27 +91,27 @@ class MontyHall2(MDPEnv, ModelFreeEnv):
         return self._recompenses[i]
 
     def p(self, s: int, a: int, s_p: int, r_index: int) -> float:
-        """p(s', r | s, a). Actions fantômes (a ≥ 2) hors départ : p = 0."""
+        # p(s',r|s,a). actions fantomes (a >= 2) hors depart : p = 0
         if s == self.TERMINAL:
             return 0.0
         r = self._recompenses[r_index]
 
         if s == self.DEPART:
-            # Décision 1 : les 5 portes sont symétriques, tout choix mène
-            # à l'état 1 avec certitude et reward 0.
+            # decision 1 : les 5 portes sont symetriques, tout choix mene
+            # a l'etat 1 avec certitude et reward 0
             return 1.0 if (s_p == 1 and r == 0.0) else 0.0
 
         if a not in (GARDER, CHANGER):
             return 0.0
 
-        if s == 1:  # décision 2
+        if s == 1:  # decision 2
             return 1.0 if (s_p == 2 + a and r == 0.0) else 0.0
 
-        if s in (2, 3):  # décision 3, d2 = s - 2
+        if s in (2, 3):  # decision 3, d2 = s - 2
             d2 = s - 2
             return 1.0 if (s_p == 4 + 2 * d2 + a and r == 0.0) else 0.0
 
-        # s ∈ {4..7} : décision finale, ouverture de la porte.
+        # s dans 4..7 : decision finale, ouverture de la porte
         if s_p != self.TERMINAL:
             return 0.0
         d2, d3 = divmod(s - 4, 2)
@@ -119,14 +119,14 @@ class MontyHall2(MDPEnv, ModelFreeEnv):
         proba_gagner = q if a == GARDER else 1 - q
         return float(proba_gagner if r == 1.0 else 1 - proba_gagner)
 
-    # Contrat ModelFreeEnv
+    # contrat ModelFreeEnv
 
     def reset(self) -> None:
         self._gagnante = self._rng.randrange(NB_PORTES)
         self._portes = set(range(NB_PORTES))   # portes encore en jeu
         self._tenue: Optional[int] = None      # porte tenue par l'agent
-        self._historique: List[int] = []       # décisions 2 et 3
-        self._decision = 1                     # prochaine décision (1..4)
+        self._historique: List[int] = []       # decisions 2 et 3
+        self._decision = 1                     # prochaine decision (1..4)
         self._score = 0.0
 
     def _retirer_une_porte(self) -> None:
@@ -150,7 +150,7 @@ class MontyHall2(MDPEnv, ModelFreeEnv):
                 self._tenue = self._rng.choice(autres)
             self._historique.append(action)
             self._retirer_une_porte()
-        else:  # décision 4 : ouverture
+        else:  # decision 4 : ouverture
             if action not in (GARDER, CHANGER):
                 raise ValueError(f"Décisions 2-4 : garder(0)/changer(1), reçu {action}")
             if action == CHANGER:
@@ -208,7 +208,7 @@ class MontyHall2(MDPEnv, ModelFreeEnv):
         print(f"score = {self._score}")
 
 
-# Mode humain : python -m environments.monty_hall_2
+# mode humain : python -m environments.monty_hall_2
 
 if __name__ == "__main__":
     import os
@@ -272,7 +272,7 @@ if __name__ == "__main__":
             touche = lire_touche()
             if touche == "quitter":
                 break
-            # Traduire la touche en action selon la décision en cours.
+            # traduire la touche en action selon la decision en cours
             action = None
             if env.current_state() == MontyHall2.DEPART:
                 if touche in "abcde":

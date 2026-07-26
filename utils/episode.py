@@ -1,4 +1,4 @@
-# Helper partagé : joue un épisode sur un ModelFreeEnv, récompense = delta score().
+# Helper partage : joue un episode sur un ModelFreeEnv, recompense = delta score().
 from typing import Callable, List, Tuple
 
 from environments.base import ModelFreeEnv
@@ -7,7 +7,7 @@ from environments.base import ModelFreeEnv
 def run_episode(
     env: ModelFreeEnv, choisir_action: Callable[[int], int]
 ) -> List[Tuple[int, int, float, int]]:
-    # rejoue jusqu'à l'état terminal, choisir_action(etat) -> action (fournie par l'algo appelant)
+    # rejoue jusqu'a l'etat terminal, choisir_action(etat) -> action (fournie par l'algo appelant)
     env.reset()
     transitions = []
     while not env.is_game_over():

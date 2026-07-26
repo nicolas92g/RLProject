@@ -1,4 +1,4 @@
-# Sauvegarde/chargement de V, Q et Politique en JSON (lisible, pas de dépendance).
+# Sauvegarde/chargement de V, Q et Politique en JSON (lisible, pas de dependance).
 import json
 from typing import List
 

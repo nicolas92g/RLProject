@@ -1,4 +1,4 @@
-# Sarsa (on-policy) et Q-Learning (off-policy), cf. Sutton & Barto §6.4/6.5.
+# Sarsa (on-policy) et Q-Learning (off-policy)
 from typing import List
 
 from algorithms.monte_carlo import action_epsilon_gloutonne, action_gloutonne
@@ -24,7 +24,7 @@ def sarsa(
             s_p = env.current_state()
 
             if env.is_game_over():
-                # terminal : pas de Q(s', a') à bootstrap, cf. convention Q[terminal,:]=0
+                # terminal : pas de Q(s',a') a bootstrap, convention Q[terminal,:]=0
                 Q[s][a] += alpha * (r - Q[s][a])
                 Q[s_p] = [0.0] * nb_actions
                 break
@@ -57,7 +57,7 @@ def q_learning(
                 Q[s][a] += alpha * (r - Q[s][a])
                 Q[s_p] = [0.0] * nb_actions
             else:
-                # off-policy : bootstrap sur le max, pas sur l'action réellement choisie ensuite
+                # off-policy : bootstrap sur le max, pas sur l'action reellement choisie ensuite
                 meilleure_a = action_gloutonne(Q, s_p, env.available_actions())
                 Q[s][a] += alpha * (r + gamma * Q[s_p][meilleure_a] - Q[s][a])
 

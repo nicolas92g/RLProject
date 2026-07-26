@@ -5,7 +5,7 @@ from utils.policy import Politique
 
 
 def _valeur_action(env: MDPEnv, V: List[float], s: int, a: int, gamma: float) -> float:
-    # espérance de r + gamma * V(s') sur (s', r), cf. Sutton & Barto §4.1
+    # esperance de r + gamma*V(s') sur (s',r)
     total = 0.0
     for s_p in range(env.num_states()):
         for r_index in range(env.num_rewards()):
@@ -16,7 +16,7 @@ def _valeur_action(env: MDPEnv, V: List[float], s: int, a: int, gamma: float) ->
 
 
 def _evaluation_politique(env: MDPEnv, pi: Politique, V: List[float], gamma: float, theta: float) -> None:
-    # met à jour V en place jusqu'à convergence, cf. Sutton & Barto eq. 4.5
+    # met a jour V en place jusqu'a convergence
     nb_etats = env.num_states()
     nb_actions = env.num_actions()
     while True:
@@ -35,7 +35,7 @@ def _evaluation_politique(env: MDPEnv, pi: Politique, V: List[float], gamma: flo
 
 
 def _amelioration_politique(env: MDPEnv, V: List[float], gamma: float) -> Tuple[Politique, List[int]]:
-    # extrait l'action gloutonne par état, cf. Sutton & Barto eq. 4.9
+    # extrait l'action gloutonne par etat
     nb_etats = env.num_states()
     nb_actions = env.num_actions()
     meilleures_actions = []
@@ -54,7 +54,7 @@ def _amelioration_politique(env: MDPEnv, V: List[float], gamma: float) -> Tuple[
 def policy_iteration(
     env: MDPEnv, gamma: float = 0.999999, theta: float = 0.000001
 ) -> Tuple[Politique, List[float]]:
-    # alternance évaluation / amélioration jusqu'à politique stable, cf. Sutton & Barto §4.3
+    # alternance evaluation / amelioration jusqu'a politique stable
     nb_etats = env.num_states()
     V = [0.0] * nb_etats
     pi = Politique.uniforme(nb_etats, env.num_actions())
@@ -73,7 +73,7 @@ def policy_iteration(
 def value_iteration(
     env: MDPEnv, gamma: float = 0.999999, theta: float = 0.000001
 ) -> Tuple[Politique, List[float]]:
-    # évaluation et amélioration fusionnées via un max par sweep, cf. Sutton & Barto eq. 4.10
+    # evaluation et amelioration fusionnees via un max par sweep
     nb_etats = env.num_states()
     nb_actions = env.num_actions()
     V = [0.0] * nb_etats

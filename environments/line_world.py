@@ -10,7 +10,7 @@ class LineWorld(MDPEnv):
     def num_rewards(self) -> int:
         return 3
     def reward(self, i: int) -> float:
-        # indexation du notebook du prof : 0 = neutre, 1 = perdu, 2 = gagné
+        # indexation du notebook du prof : 0 = neutre, 1 = perdu, 2 = gagne
         rewards = [0.0, -1.0, 1.0]
         return rewards[i]
     def p(self, s: int, a: int, s_p: int, r_index: int) -> float:
@@ -43,7 +43,7 @@ class LineWorld(MDPEnv):
 
 
 class LineWorldEnv(ModelFreeEnv):
-    # conventions du notebook du prof : 5 cases, départ au milieu, terminal aux bouts
+    # conventions du notebook du prof : 5 cases, depart au milieu, terminal aux bouts
     NUM_CELLS = 5
 
     def __init__(self) -> None:

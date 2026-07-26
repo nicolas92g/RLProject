@@ -1,4 +1,4 @@
-# Adaptateur ModelFreeEnv pour les secret envs 0 à 3 (wrapper fourni par le prof).
+# Adaptateur ModelFreeEnv pour les secret envs 0 a 3 (wrapper fourni par le prof).
 import os
 import platform
 from typing import List
@@ -6,8 +6,8 @@ from typing import List
 from environments import secret_envs_wrapper as wrapper
 from environments.base import ModelFreeEnv
 
-# le wrapper fourni résout lib_path en relatif ("./libs/...") selon le cwd du process ;
-# on le remplace par un chemin absolu pour ne pas dépendre du répertoire d'exécution
+# le wrapper fourni resout lib_path en relatif ("./libs/...") selon le cwd du process,
+# on le remplace par un chemin absolu pour ne pas dependre du repertoire d'execution
 _LIBS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "libs")
 _SYSTEM = platform.system().lower()
 if _SYSTEM == "windows":

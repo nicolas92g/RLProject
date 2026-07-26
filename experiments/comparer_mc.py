@@ -1,9 +1,9 @@
 # Compare Monte Carlo ES, on-policy first-visit et off-policy MC control sur
-# Grid World, Monty Hall 2 et Rock Paper Scissors (TODO.md Phase 3, étape 2).
-# Vérifié contre l'optimum exact (Policy Iteration) — mais en comparant la
-# VALEUR de l'action apprise à V*(s), pas l'action choisie par Policy
-# Iteration : plusieurs de ces environnements ont des actions ex-aequo
-# (cf. étape 1), comparer les indices serait trop strict.
+# Grid World, Monty Hall 2 et Rock Paper Scissors, verifie contre l'optimum
+# exact (Policy Iteration). On compare la VALEUR de l'action apprise a
+# V*(s), pas l'action choisie par Policy Iteration : plusieurs de ces
+# environnements ont des actions ex-aequo, comparer les indices serait trop
+# strict.
 import random
 
 from algorithms.dynamic_programming import _valeur_action, policy_iteration
@@ -32,7 +32,7 @@ def _verifier(Env, V_star, gamma, etats, nb_actions, Q) -> bool:
 def comparer_grid_world() -> None:
     print("=== Grid World ===")
     # GridWorld n'a pas de rng injectable : on fixe la graine globale pour
-    # rendre le taux d'abandon de MC ES ci-dessous reproductible.
+    # rendre le taux d'abandon de MC ES reproductible
     random.seed(GRAINE)
     gamma = 0.999999
     env = GridWorld()
@@ -58,10 +58,9 @@ def comparer_monty_hall_2() -> None:
     etats = list(range(1, 8))
     _, V_star = policy_iteration(MontyHall2(), gamma=gamma)
 
-    # Arbre profond : les états 4-7 ne sont atteints qu'après deux choix
-    # non-gloutons d'affilée (cf. Phase 2) — epsilon relevé et vérification
-    # avec retentative sur une autre graine pour les 2 algos epsilon-greedy.
-    # MC ES n'a pas ce problème (exploring starts), une seule tentative suffit.
+    # arbre profond : les etats 4-7 ne sont atteints qu'apres 2 choix
+    # non-gloutons d'affilee, epsilon releve + retentative pour les 2 algos
+    # epsilon-greedy. MC ES n'a pas ce probleme (exploring starts)
 
     Q_es = monte_carlo_es(
         MontyHall2(rng=random.Random(GRAINE)), nb_episodes=40000, gamma=gamma, nb_pas_echauffement_max=4

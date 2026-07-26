@@ -1,26 +1,18 @@
-# Compare Dyna-Q sur Grid World, Monty Hall 2 et Rock Paper Scissors
-# (TODO.md Phase 3, étape 4). Même méthode de vérification que les étapes
-# précédentes : comparer la VALEUR de l'action apprise à V*(s).
+# Compare Dyna-Q sur Grid World, Monty Hall 2 et Rock Paper Scissors, meme
+# methode de verification : comparer la VALEUR de l'action apprise a V*(s).
 #
-# Sur Grid World et Rock Paper Scissors (transitions ET récompenses
-# déterministes), Dyna-Q converge nettement plus vite que Q-Learning/Sarsa
-# (3000 épisodes suffisent contre 10000) — c'est tout l'intérêt de la
-# planification : chaque pas réel déclenche n mises à jour supplémentaires
-# rejouées depuis le modèle appris.
+# Sur Grid World et Rock Paper Scissors (deterministes), Dyna-Q converge
+# nettement plus vite que Q-Learning/Sarsa (3000 episodes suffisent contre
+# 10000), c'est l'interet de la planification : chaque pas reel declenche
+# n mises a jour supplementaires rejouees depuis le modele appris.
 #
-# Sur Monty Hall 2, ce même modèle devient un problème : `planning.py` ne
-# retient QUE la dernière transition observée pour chaque (s,a)
-# (`modele[(s,a)] = (r, s_p)`), pas une moyenne. À la décision finale
-# (états 4-7), la récompense est stochastique (0 ou 1, gagné/perdu) : la
-# phase de planification rejoue n fois d'affilée ce dernier échantillon
-# unique, ce qui biaise Q très fortement (mesuré : Q sous-estimé de 0.1 à
-# 0.4 en moyenne, écart-type jusqu'à 0.45) au lieu de moyenner sur plusieurs
-# essais comme le ferait un vrai pas Q-Learning. C'est une limite connue du
-# Dyna-Q "de base" (cf. Sutton & Barto §8.2) : il suppose un environnement
-# déterministe. Contrairement au problème d'arbre profond des étapes
-# précédentes, plus d'épisodes ou d'exploration n'y changent pas grand
-# chose ; réduire `n_planification` et `alpha` atténue un peu le biais
-# sans l'éliminer.
+# Sur Monty Hall 2, ce meme modele devient un probleme : planning.py ne
+# retient que la derniere transition observee pour chaque (s,a), pas une
+# moyenne. A la decision finale, la recompense est stochastique (gagne ou
+# perdu) : la planification rejoue plusieurs fois d'affilee ce dernier
+# echantillon, ce qui biaise Q vers le bas au lieu de moyenner comme un
+# vrai pas Q-Learning. Limite connue du Dyna-Q de base : il suppose un
+# environnement deterministe.
 import random
 
 from algorithms.dynamic_programming import _valeur_action, policy_iteration
@@ -65,9 +57,8 @@ def comparer_monty_hall_2() -> None:
     etats = list(range(1, 8))
     _, V_star = policy_iteration(MontyHall2(), gamma=gamma)
 
-    # Récompense stochastique à la décision finale + modèle à un seul
-    # échantillon (cf. commentaire en tête de fichier) : taux de réussite
-    # mesuré ~30% par tentative, retentative plus généreuse qu'ailleurs.
+    # recompense stochastique + modele a un seul echantillon (voir en tete
+    # de fichier) : taux de reussite ~30% par tentative, on retente plus
     for tentative in range(30):
         graine = GRAINE + tentative
         random.seed(graine)

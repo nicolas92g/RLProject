@@ -1,8 +1,8 @@
 import random
 from typing import List
 
-# Une politique associe à chaque état une distribution de probabilité sur les actions.
-# probs[s][a] = probabilité de choisir l'action a dans l'état s (la ligne s somme à 1).
+# Une politique associe a chaque etat une distribution de probabilite sur les actions.
+# probs[s][a] = probabilite de choisir l'action a dans l'etat s (la ligne s somme a 1).
 
 
 class Politique:
@@ -14,13 +14,13 @@ class Politique:
 
     @classmethod
     def uniforme(cls, nb_etats: int, nb_actions: int) -> "Politique":
-        # chaque action a la même probabilité dans chaque état
+        # chaque action a la meme probabilite dans chaque etat
         p = 1.0 / nb_actions
         return cls([[p] * nb_actions for _ in range(nb_etats)])
 
     @classmethod
     def deterministe(cls, action_par_etat: List[int], nb_actions: int) -> "Politique":
-        # action_par_etat[s] = l'unique action choisie dans l'état s (probabilité 1.0)
+        # action_par_etat[s] = l'unique action choisie dans l'etat s (probabilite 1.0)
         probs = []
         for a in action_par_etat:
             ligne = [0.0] * nb_actions
@@ -30,7 +30,7 @@ class Politique:
 
     @classmethod
     def gloutonne(cls, q_values: List[List[float]]) -> "Politique":
-        # dans chaque état, l'action de plus grande valeur Q (argmax)
+        # dans chaque etat, l'action de plus grande valeur Q (argmax)
         probs = []
         for valeurs in q_values:
             meilleure = max(valeurs)
@@ -71,7 +71,7 @@ class Politique:
         return meilleure
 
     def echantillonner(self, etat: int) -> int:
-        # tire une action au hasard selon la distribution de l'état (méthode de la roulette)
+        # tire une action au hasard selon la distribution de l'etat (methode de la roulette)
         tirage = random.random()
         cumul = 0.0
         ligne = self._probs[etat]
@@ -79,4 +79,4 @@ class Politique:
             cumul += p
             if tirage < cumul:
                 return action
-        return len(ligne) - 1  # filet contre l'imprécision flottante (cumul < 1.0)
+        return len(ligne) - 1  # filet contre l'imprecision flottante (cumul < 1.0)

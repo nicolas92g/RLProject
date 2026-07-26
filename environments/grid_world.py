@@ -1,16 +1,16 @@
 """
-Grid World : 4×4, piège haut-droite (-1), objectif bas-droite (+1).
+Grid World : 4x4, piege haut-droite (-1), objectif bas-droite (+1).
 Contrats MDPEnv et ModelFreeEnv pour tester tous les algos.
 
-État = ligne * nb_colonnes + colonne.
-Les bords reflètent (l'agent reste sur place, reward 0).
+Etat = ligne * nb_colonnes + colonne.
+Les bords reflechissent (l'agent reste sur place, reward 0).
 """
 
 from typing import List
 
 from environments.base import MDPEnv, ModelFreeEnv
 
-# Actions (indices imposés par les contrats : des entiers de 0 à 3).
+# Actions (indices imposes par les contrats : entiers de 0 a 3)
 HAUT = 0
 BAS = 1
 GAUCHE = 2
@@ -20,7 +20,7 @@ NOMS_ACTIONS = {HAUT: "haut", BAS: "bas", GAUCHE: "gauche", DROITE: "droite"}
 
 
 class GridWorld(MDPEnv, ModelFreeEnv):
-    """Grille rectangulaire avec un objectif (+1) et un piège (-1)."""
+    """Grille rectangulaire avec un objectif (+1) et un piege (-1)."""
 
     def __init__(self, nb_lignes: int = 4, nb_colonnes: int = 4) -> None:
         if nb_lignes < 2 or nb_colonnes < 2:
@@ -31,30 +31,27 @@ class GridWorld(MDPEnv, ModelFreeEnv):
         self.nb_lignes = nb_lignes
         self.nb_colonnes = nb_colonnes
 
-        # Cases particulières (indices d'état aplatis).
+        # cases particulieres (indices d'etat aplatis)
         self.depart = 0                                    # coin haut-gauche
         self.piege = nb_colonnes - 1                       # coin haut-droit
         self.objectif = nb_lignes * nb_colonnes - 1        # coin bas-droit
 
-        # Les trois rewards possibles de l'environnement, indexés pour le
-        # contrat MDPEnv (num_rewards / reward(i) / p(..., r_index)).
+        # les 3 rewards possibles, indexes pour le contrat MDPEnv
         self._recompenses = [-1.0, 0.0, 1.0]
 
-        # Partie ModelFreeEnv : position courante et score cumulé.
+        # partie ModelFreeEnv : position courante et score cumule
         self.reset()
 
-    # ------------------------------------------------------------------ #
-    # Dynamique commune aux deux contrats                                  #
-    # ------------------------------------------------------------------ #
+    # -------------------------------------------------------------- #
+    # dynamique commune aux deux contrats                             #
+    # -------------------------------------------------------------- #
 
     def _est_terminal(self, s: int) -> bool:
         return s == self.piege or s == self.objectif
 
     def _destination(self, s: int, a: int) -> int:
-        """
-        État d'arrivée quand on joue l'action a depuis l'état s (déterministe).
-        Un déplacement qui sortirait de la grille laisse l'agent sur place.
-        """
+        # etat d'arrivee en jouant a depuis s (deterministe). Sortir de la
+        # grille laisse l'agent sur place
         ligne, colonne = divmod(s, self.nb_colonnes)
         if a == HAUT:
             ligne = max(ligne - 1, 0)
@@ -69,16 +66,16 @@ class GridWorld(MDPEnv, ModelFreeEnv):
         return ligne * self.nb_colonnes + colonne
 
     def _recompense_arrivee(self, s_p: int) -> float:
-        """Reward touché en entrant dans l'état s_p."""
+        # reward touche en entrant dans l'etat s_p
         if s_p == self.piege:
             return -1.0
         if s_p == self.objectif:
             return 1.0
         return 0.0
 
-    # ------------------------------------------------------------------ #
-    # Contrat MDPEnv (Dynamic Programming)                                 #
-    # ------------------------------------------------------------------ #
+    # -------------------------------------------------------------- #
+    # contrat MDPEnv (Dynamic Programming)                            #
+    # -------------------------------------------------------------- #
 
     def num_states(self) -> int:
         return self.nb_lignes * self.nb_colonnes
@@ -93,7 +90,7 @@ class GridWorld(MDPEnv, ModelFreeEnv):
         return self._recompenses[i]
 
     def p(self, s: int, a: int, s_p: int, r_index: int) -> float:
-        """p(s', r | s, a). Déterministe : une seule (s', r) possible."""
+        # p(s',r|s,a), deterministe : une seule (s',r) possible
         if self._est_terminal(s):
             return 0.0
         destination = self._destination(s, a)
@@ -103,7 +100,7 @@ class GridWorld(MDPEnv, ModelFreeEnv):
             return 0.0
         return 1.0
 
-    # Contrat ModelFreeEnv (Monte Carlo, TD, Planning)
+    # contrat ModelFreeEnv (Monte Carlo, TD, Planning)
 
     def reset(self) -> None:
         self._etat = self.depart
@@ -153,8 +150,8 @@ class GridWorld(MDPEnv, ModelFreeEnv):
         print(f"score = {self._score}")
 
 
-# Mode humain : python -m environments.grid_world
-# Touches sans Entrée (termios/tty en cbreak) + écran redessiné par ANSI.
+# mode humain : python -m environments.grid_world
+# touches sans entree (termios/tty en cbreak) + ecran redessine par ANSI
 
 if __name__ == "__main__":
     import os

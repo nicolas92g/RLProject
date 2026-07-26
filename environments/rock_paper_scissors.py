@@ -2,8 +2,8 @@
 Two-Round Rock Paper Scissors : l'adversaire rejoue notre coup au round 2.
 Contrats MDPEnv et ModelFreeEnv.
 
-État encode le round et le coup du round 1 : 0 (round 1), 1-3 (round 2),
-4 (terminal). Score final ∈ {-2, -1, 0, 1, 2}.
+Etat encode le round et le coup du round 1 : 0 (round 1), 1-3 (round 2),
+4 (terminal). Score final dans {-2, -1, 0, 1, 2}.
 """
 
 import random
@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from environments.base import MDPEnv, ModelFreeEnv
 
-# Actions (les mêmes aux deux rounds).
+# actions (les memes aux deux rounds)
 PIERRE = 0
 FEUILLE = 1
 CISEAUX = 2
@@ -20,26 +20,26 @@ NOMS_ACTIONS = {PIERRE: "pierre", FEUILLE: "feuille", CISEAUX: "ciseaux"}
 
 
 def _compare(a: int, b: int) -> int:
-    # (a - b) % 3 == 1 ⟺ a bat b (formule modulaire plus lisible qu'une table)
+    # (a - b) % 3 == 1 revient a dire que a bat b (formule modulaire plus
+    # lisible qu'une table de correspondance)
     if a == b:
         return 0
     return 1 if (a - b) % 3 == 1 else -1
 
 
 class TwoRoundRPS(MDPEnv, ModelFreeEnv):
-    """Pierre-Feuille-Ciseaux en 2 rounds, l'adversaire rejouant l'agent."""
+    # pierre-feuille-ciseaux en 2 rounds, l'adversaire rejouant l'agent
 
-    # États particuliers (indices, cf. encodage détaillé dans le docstring).
+    # etats particuliers (indices, cf encodage dans le docstring du module)
     DEPART = 0
     TERMINAL = 4
 
     def __init__(self, rng: Optional[random.Random] = None) -> None:
         # rng injectable pour rendre les tirages de l'adversaire
-        # reproductibles pendant les tests/expérimentations.
+        # reproductibles pendant les tests
         self._rng = rng if rng is not None else random.Random()
         self._recompenses = [-1.0, 0.0, 1.0]
         self.reset()
-
 
     def _est_terminal(self, s: int) -> bool:
         return s == self.TERMINAL
@@ -47,7 +47,7 @@ class TwoRoundRPS(MDPEnv, ModelFreeEnv):
     def _est_round_2(self, s: int) -> bool:
         return s in (1, 2, 3)
 
-    # Contrat MDPEnv
+    # contrat MDPEnv
 
     def num_states(self) -> int:
         return 5
@@ -62,8 +62,8 @@ class TwoRoundRPS(MDPEnv, ModelFreeEnv):
         return self._recompenses[i]
 
     def p(self, s: int, a: int, s_p: int, r_index: int) -> float:
-        """p(s', r | s, a). Round 1 : stochastique (1/3 chaque issue).
-        Round 2 : déterministe (adversaire forcé rejouer)."""
+        # p(s',r|s,a). round 1 stochastique (1/3 chaque issue), round 2
+        # deterministe (l'adversaire est force de rejouer)
         if self._est_terminal(s):
             return 0.0
 
@@ -74,14 +74,14 @@ class TwoRoundRPS(MDPEnv, ModelFreeEnv):
                 return 0.0
             return 1.0 / 3.0
 
-        # s ∈ {1, 2, 3} : round 2.
+        # s dans {1,2,3} : round 2
         if s_p != self.TERMINAL:
             return 0.0
         coup_round1 = s - 1
         resultat = _compare(a, coup_round1)
         return 1.0 if r == resultat else 0.0
 
-    # Contrat ModelFreeEnv
+    # contrat ModelFreeEnv
 
     def reset(self) -> None:
         self._round = 1
@@ -96,7 +96,7 @@ class TwoRoundRPS(MDPEnv, ModelFreeEnv):
         if self._round == 1:
             coup_adverse = self._rng.randrange(3)
             self._coup_round1 = action
-        else:  # round 2 : l'adversaire est forcé de rejouer le round 1
+        else:  # round 2 : l'adversaire est force de rejouer le round 1
             coup_adverse = self._coup_round1
 
         self._score += _compare(action, coup_adverse)
@@ -127,12 +127,9 @@ class TwoRoundRPS(MDPEnv, ModelFreeEnv):
     def maximum_actions_count(self) -> int:
         return self.num_actions()
 
-    # ------------------------------------------------------------------ #
-    # Visualisation                                                        #
-    # ------------------------------------------------------------------ #
+    # visualisation
 
     def pretty_print(self) -> None:
-        """Affiche le round courant, les coups joués et le score cumulé."""
         if self._round <= 2:
             print(f"Round {min(self._round, 2)}/2")
         else:
@@ -144,8 +141,8 @@ class TwoRoundRPS(MDPEnv, ModelFreeEnv):
         print(f"  score = {self._score:+.1f}")
 
 
-# Mode humain : python -m environments.rock_paper_scissors
-# Même principe que grid_world.py.
+# mode humain : python -m environments.rock_paper_scissors
+# meme principe que grid_world.py
 
 if __name__ == "__main__":
     import os

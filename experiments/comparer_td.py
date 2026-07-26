@@ -1,17 +1,15 @@
 # Compare Sarsa (on-policy) et Q-Learning (off-policy) sur Grid World, Monty
-# Hall 2 et Rock Paper Scissors (TODO.md Phase 3, étape 3). Même méthode de
-# vérification que comparer_mc.py : comparer la VALEUR de l'action apprise à
-# V*(s), pas l'action choisie par Policy Iteration (ties possibles).
+# Hall 2 et Rock Paper Scissors. Meme methode de verification que
+# comparer_mc.py : comparer la VALEUR de l'action apprise a V*(s), pas
+# l'action choisie par Policy Iteration (ties possibles).
 #
-# Point théorique à noter (cf. Sutton & Barto §6.4-6.5) : Sarsa est
-# on-policy, il évalue la politique epsilon-greedy qu'il suit réellement, pas
-# la politique gloutonne pure. À epsilon fixe (pas de décroissance vers 0),
-# sa politique apprise peut donc rester légèrement différente de l'optimum
-# glouton strict — Q-Learning, off-policy, vise directement l'optimum quel
-# que soit son comportement exploratoire. Sur Monty Hall 2 (arbre profond),
-# baisser epsilon pour réduire ce biais aggrave en fait la convergence (les
-# branches rares sont encore moins visitées) : c'est le problème d'exploration
-# de la Phase 2 qui domine, pas le biais on-policy.
+# Point theorique : Sarsa est on-policy, il evalue la politique
+# epsilon-greedy qu'il suit reellement, pas la politique gloutonne pure.
+# Q-Learning, off-policy, vise directement l'optimum quel que soit son
+# comportement exploratoire. Sur Monty Hall 2 (arbre profond), baisser
+# epsilon pour reduire ce biais aggrave en fait la convergence (les
+# branches rares sont encore moins visitees) : le probleme d'exploration
+# domine, pas le biais on-policy.
 import random
 
 from algorithms.dynamic_programming import _valeur_action, policy_iteration
@@ -59,9 +57,8 @@ def comparer_monty_hall_2() -> None:
     etats = list(range(1, 8))
     _, V_star = policy_iteration(MontyHall2(), gamma=gamma)
 
-    # Arbre profond, même problème qu'en Phase 2 : les états 4-7 ne sont
-    # atteints qu'après deux choix non-gloutons d'affilée. Vérification +
-    # retentative sur une autre graine pour les deux algos.
+    # arbre profond : les etats 4-7 ne sont atteints qu'apres 2 choix
+    # non-gloutons d'affilee. verification + retentative pour les 2 algos
     for tentative in range(20):
         graine = GRAINE + tentative
         random.seed(graine)
