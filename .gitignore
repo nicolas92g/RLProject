@@ -29,5 +29,4 @@ Thumbs.db
 # (gros CSV, images) doivent être exclus par la suite.
 experiments/*.log
 documents/
-.claude/
 *.so
