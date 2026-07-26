@@ -98,25 +98,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`requirements.txt` liste numpy, matplotlib, jupyter, ipykernel, tqdm, pygame
-(versions non épinglées pour l'instant).
-
-## Entraîner et rejouer un modèle
-
-```bash
-python -m experiments.entrainer_et_sauvegarder   # écrit dans saved_models/
-```
-
-```python
-from environments.line_world import LineWorldEnv
-from utils.io import charger_Q
-from utils.interaction import rejouer_politique, jouer_manuellement
-
-Q = charger_Q("saved_models/line_world/Q_q_learning.json")
-rejouer_politique(LineWorldEnv(), Q)   # rejeu pas-à-pas, sans réentraîner
-jouer_manuellement(LineWorldEnv())     # mode manuel (agent humain)
-```
-
 ## Organisation du dépôt
 
 ```
@@ -124,7 +105,7 @@ algorithms/     implémentations RL
 environments/   problèmes test + contrats (base.py)
 utils/          représentation des politiques, entrées/sorties, rejeu/mode manuel
 experiments/    scripts d'expérimentation et d'entraînement
-saved_models/   modèles entraînés (versionnés — livrable imposé par le sujet)
+saved_models/   modèles entraînés
 report/         rapport et visualisations
-libs/           binaires des secret envs fournis par le prof (.so/.dll/.dylib)
+libs/           binaires des secret envs fournis (.so/.dll/.dylib)
 ```
